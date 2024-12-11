@@ -1,5 +1,6 @@
 package com.hanghae.reviewservice.entity;
 
+import com.hanghae.reviewservice.dto.ReviewRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,5 +33,12 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    public Review(ReviewRequestDto requestDto, Product product) {
+        this.product = product;
+        this.userId = requestDto.getUserId();
+        this.content = requestDto.getContent();
+        this.score = requestDto.getScore();
+    }
 
 }
