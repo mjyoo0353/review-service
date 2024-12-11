@@ -1,5 +1,6 @@
 package com.hanghae.reviewservice.entity;
 
+import com.hanghae.reviewservice.dto.ProductRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,5 +26,12 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<Review> reviews;
+
+
+    public Product(ProductRequestDto requestDto) {
+        this.reviewCount = requestDto.getReviewCount();
+        this.score = requestDto.getScore();
+    }
+
 
 }
