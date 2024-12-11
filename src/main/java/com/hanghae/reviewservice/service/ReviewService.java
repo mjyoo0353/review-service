@@ -16,6 +16,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ProductRepository productRepository;
+    private final ProductService productService;
 
     //상품에 대한 리뷰 등록
     public ReviewResponseDto createReview(Long productId, ReviewRequestDto requestDto) {
@@ -27,8 +28,19 @@ public class ReviewService {
         reviewRepository.save(review);
         productRepository.save(product);
 
+        //리뷰 등록 시 리뷰 수 증가 및 평균 점수 업데이트
+        Long totalReviewCount = product.getReviewCount() + 1;
+        double newAverageScore = calculateAverageScore(product.getScore(), product.getReviewCount(), requestDto.getScore());
+
+        productService.updateReviewCountAndScore(productId, totalReviewCount, newAverageScore);
+
         ReviewResponseDto reviewResponseDto = new ReviewResponseDto(review);
         return reviewResponseDto;
+    }
+
+    //새로운 평균 점수 계산
+    private double calculateAverageScore(double averageScore, Long totalReviewCount, double newScore) {
+        return (averageScore * totalReviewCount + newScore) / (totalReviewCount + 1);
     }
 
 }
