@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -20,5 +22,8 @@ public class Product {
 
     @Column(nullable = false)
     private double score; //평균 점수
+
+    @OneToMany(mappedBy = "product")
+    private List<Review> reviews;
 
 }

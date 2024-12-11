@@ -29,5 +29,8 @@ public class Review {
 
     private String imageUrl;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
 }
