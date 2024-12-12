@@ -23,6 +23,12 @@ public class ReviewService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다."));
 
+        // 유저가 상품에 대해 리뷰를 작성했는지 확인하고 이미 작성한 리뷰가 있다면 예외처리
+        boolean isExistReview = reviewRepository.existsByUserIdAndProductId(requestDto.getUserId(), productId);
+        if (isExistReview) {
+            throw new IllegalArgumentException("하나의 상품에 대해 하나의 리뷰만 작성이 가능합니다.");
+        }
+
         Review review = new Review(requestDto, product);
 
         reviewRepository.save(review);
