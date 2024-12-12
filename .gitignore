@@ -32,6 +32,7 @@ out/
 application.yml
 application-*.yml
 application.properties
+docker-compose.yml
 
 ### NetBeans ###
 /nbproject/private/
