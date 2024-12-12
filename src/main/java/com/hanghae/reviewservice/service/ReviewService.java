@@ -52,7 +52,7 @@ public class ReviewService {
     //상품에 대한 리뷰 조회
     public ReviewListResponseDto getReviewList(Long productId) {
         //productId와 관련된 모든 리뷰 데이터를 reviewList에 저장
-        List<Review> reviewList = reviewRepository.findAllByProductId(productId);
+        List<Review> reviewList = reviewRepository.findAllByProductIdOrderByCreatedAtDesc(productId);
 
         //리뷰 리스트가 없다면 예외처리
         if (reviewList.isEmpty()) {
