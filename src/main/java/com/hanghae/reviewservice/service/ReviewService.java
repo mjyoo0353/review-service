@@ -1,5 +1,6 @@
 package com.hanghae.reviewservice.service;
 
+import com.hanghae.reviewservice.dto.ReviewListResponseDto;
 import com.hanghae.reviewservice.dto.ReviewRequestDto;
 import com.hanghae.reviewservice.dto.ReviewResponseDto;
 import com.hanghae.reviewservice.entity.Product;
@@ -9,6 +10,9 @@ import com.hanghae.reviewservice.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +21,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ProductRepository productRepository;
     private final ProductService productService;
+    private final S3Service s3Service;
 
     //상품에 대한 리뷰 등록
     public ReviewResponseDto createReview(Long productId, ReviewRequestDto requestDto) {
@@ -42,6 +47,34 @@ public class ReviewService {
 
         ReviewResponseDto reviewResponseDto = new ReviewResponseDto(review);
         return reviewResponseDto;
+    }
+
+    //상품에 대한 리뷰 조회
+    public ReviewListResponseDto getReviewList(Long productId) {
+        //productId와 관련된 모든 리뷰 데이터를 reviewList에 저장
+        List<Review> reviewList = reviewRepository.findAllByProductId(productId);
+
+        //리뷰 리스트가 없다면 예외처리
+        if (reviewList.isEmpty()) {
+            throw new IllegalArgumentException("해당 상품에 대한 리뷰가 존재하지 않습니다.");
+        }
+
+        //리뷰 리스트의 총 개수와 평균 점수 계산
+        Long totalReviewCount = (long) reviewList.size();
+        double totalScore = 0.0;
+        for (Review review : reviewList) {
+            totalScore += review.getScore();
+        }
+        double averageScore = totalScore / totalReviewCount;
+
+        //List<Review>를 List<ReviewResponseDto>로 변환
+        List<ReviewResponseDto> reviewResponseDtos = new ArrayList<>();
+        for (Review review : reviewList) {
+            reviewResponseDtos.add(new ReviewResponseDto(review));
+        }
+
+        ReviewListResponseDto reviewListResponseDto = new ReviewListResponseDto(reviewResponseDtos, totalReviewCount, averageScore);
+        return reviewListResponseDto;
     }
 
     //새로운 평균 점수 계산

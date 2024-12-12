@@ -25,8 +25,13 @@ public class ProductController {
     //상품에 대한 리뷰 등록 API
     @PostMapping("/{productId}/reviews")
     public ReviewResponseDto createReview(@PathVariable Long productId,
-                                          @Valid @RequestBody ReviewRequestDto requestDto) {
+                                          @RequestBody @Valid ReviewRequestDto requestDto) {
         return reviewService.createReview(productId, requestDto);
     }
 
+    //상품에 대한 리뷰 조회 API
+    @GetMapping("/{productId}/reviews")
+    public ReviewListResponseDto getReviewList(@PathVariable Long productId) {
+        return reviewService.getReviewList(productId);
+    }
 }
