@@ -9,6 +9,7 @@ import com.hanghae.reviewservice.repository.ProductRepository;
 import com.hanghae.reviewservice.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,8 @@ public class ReviewService {
     private final S3Service s3Service;
 
     //상품에 대한 리뷰 등록
-    public ReviewResponseDto createReview(Long productId, ReviewRequestDto requestDto) {
+    public ReviewResponseDto createReview(Long productId, ReviewRequestDto requestDto,
+                                          MultipartFile imageFile) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다."));
 
@@ -34,7 +36,10 @@ public class ReviewService {
             throw new IllegalArgumentException("하나의 상품에 대해 하나의 리뷰만 작성이 가능합니다.");
         }
 
-        Review review = new Review(requestDto, product);
+        //이미지 파일 처리
+        String uploadImage = s3Service.uploadImage(imageFile);
+
+        Review review = new Review(requestDto, product, uploadImage);
 
         reviewRepository.save(review);
         productRepository.save(product);

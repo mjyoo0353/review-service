@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -38,11 +39,12 @@ public class Review {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    public Review(ReviewRequestDto requestDto, Product product) {
+    public Review(ReviewRequestDto requestDto, Product product, String imageUrl) {
         this.product = product;
         this.userId = requestDto.getUserId();
         this.content = requestDto.getContent();
         this.score = requestDto.getScore();
+        this.imageUrl = imageUrl;
         validateScore(this.score); // 리뷰 점수 확인
     }
 

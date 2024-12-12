@@ -1,11 +1,16 @@
 package com.hanghae.reviewservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanghae.reviewservice.dto.*;
 import com.hanghae.reviewservice.service.ProductService;
 import com.hanghae.reviewservice.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -23,11 +28,28 @@ public class ProductController {
     }
 
     //상품에 대한 리뷰 등록 API
-    @PostMapping("/{productId}/reviews")
+    @PostMapping(value = "/{productId}/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ReviewResponseDto createReview(@PathVariable Long productId,
-                                          @RequestBody @Valid ReviewRequestDto requestDto) {
-        return reviewService.createReview(productId, requestDto);
+                                          @RequestPart("requestDto") String requestDtoJson,
+                                          @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+
+        //JSON 수동 파싱처리
+        ObjectMapper objectMapper = new ObjectMapper();
+        ReviewRequestDto requestDto;
+        try {
+            requestDto = objectMapper.readValue(requestDtoJson, ReviewRequestDto.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("잘못된 데이터 형식입니다.");
+        }
+        return reviewService.createReview(productId, requestDto, imageFile);
     }
+
+    /*@PostMapping("/{productId}/reviews")
+    public ReviewResponseDto createReview(@PathVariable Long productId,
+                                          @RequestPart("requestDto") ReviewRequestDto requestDto) {
+
+        return reviewService.createReview(productId, requestDto);
+    }*/
 
     //상품에 대한 리뷰 조회 API
     @GetMapping("/{productId}/reviews")
