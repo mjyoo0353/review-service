@@ -12,7 +12,7 @@ public class ReviewListResponseDto {
     private Long cursor; //위치
     private List<ReviewResponseDto> reviewList;
 
-    public ReviewListResponseDto(List<ReviewResponseDto> reviewList, Long totalReviewCount, double averageScore) {
+    public ReviewListResponseDto(List<ReviewResponseDto> reviewList, Long totalReviewCount, double averageScore, Long cursor) {
         this.reviewList = reviewList;
         this.totalReviewCount = totalReviewCount;
         this.averageScore = averageScore;

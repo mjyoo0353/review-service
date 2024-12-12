@@ -8,6 +8,9 @@ import com.hanghae.reviewservice.entity.Review;
 import com.hanghae.reviewservice.repository.ProductRepository;
 import com.hanghae.reviewservice.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,9 +58,10 @@ public class ReviewService {
     }
 
     //상품에 대한 리뷰 조회
-    public ReviewListResponseDto getReviewList(Long productId) {
+    public ReviewListResponseDto getReviewList(Long productId, Long cursor, int size) {
         //productId와 관련된 모든 리뷰 데이터를 reviewList에 저장
-        List<Review> reviewList = reviewRepository.findAllByProductIdOrderByCreatedAtDesc(productId);
+        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Order.desc("createdAt")));
+        List<Review> reviewList = reviewRepository.findAllByProductIdAndIdGreaterThanOrderByCreatedAtDesc(productId, cursor, pageable);
 
         //리뷰 리스트가 없다면 예외처리
         if (reviewList.isEmpty()) {
@@ -78,7 +82,7 @@ public class ReviewService {
             reviewResponseDtos.add(new ReviewResponseDto(review));
         }
 
-        ReviewListResponseDto reviewListResponseDto = new ReviewListResponseDto(reviewResponseDtos, totalReviewCount, averageScore);
+        ReviewListResponseDto reviewListResponseDto = new ReviewListResponseDto(reviewResponseDtos, totalReviewCount, averageScore, cursor);
         return reviewListResponseDto;
     }
 

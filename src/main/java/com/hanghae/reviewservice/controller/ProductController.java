@@ -53,7 +53,9 @@ public class ProductController {
 
     //상품에 대한 리뷰 조회 API
     @GetMapping("/{productId}/reviews")
-    public ReviewListResponseDto getReviewList(@PathVariable Long productId) {
-        return reviewService.getReviewList(productId);
+    public ReviewListResponseDto getReviewList(@PathVariable Long productId,
+                                               @RequestParam(value = "cursor", defaultValue = "0") Long cursor,
+                                               @RequestParam(value = "size", defaultValue = "10") int size) {
+        return reviewService.getReviewList(productId, cursor, size);
     }
 }
