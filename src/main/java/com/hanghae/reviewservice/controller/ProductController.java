@@ -3,6 +3,7 @@ package com.hanghae.reviewservice.controller;
 import com.hanghae.reviewservice.dto.*;
 import com.hanghae.reviewservice.service.ProductService;
 import com.hanghae.reviewservice.service.ReviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class ProductController {
     //상품에 대한 리뷰 등록 API
     @PostMapping("/{productId}/reviews")
     public ReviewResponseDto createReview(@PathVariable Long productId,
-                                          @RequestBody ReviewRequestDto requestDto) {
+                                          @Valid @RequestBody ReviewRequestDto requestDto) {
         return reviewService.createReview(productId, requestDto);
     }
 
