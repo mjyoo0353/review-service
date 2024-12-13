@@ -28,7 +28,7 @@ public class Review {
 
     @Min(1) @Max(5)
     @Column(nullable = false)
-    private double score; //리뷰 점수 (1-5)
+    private float score; //리뷰 점수 (1-5)
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

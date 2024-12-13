@@ -44,11 +44,12 @@ public class ProductController {
         return reviewService.createReview(productId, requestDto, imageFile);
     }
 
-    /*@PostMapping("/{productId}/reviews")
+    /*@PostMapping(value = "/{productId}/reviews", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ReviewResponseDto createReview(@PathVariable Long productId,
-                                          @RequestPart("requestDto") ReviewRequestDto requestDto) {
+                                          @RequestPart(value = "requestDto") ReviewRequestDto requestDto,
+                                          @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
 
-        return reviewService.createReview(productId, requestDto);
+        return reviewService.createReview(productId, requestDto, imageFile);
     }*/
 
     //상품에 대한 리뷰 조회 API

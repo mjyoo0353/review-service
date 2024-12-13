@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public class ProductRequestDto {
     private Long reviewCount;
-    private double score;
+    private float score;
 
 }

@@ -8,10 +8,14 @@ import com.hanghae.reviewservice.entity.Review;
 import com.hanghae.reviewservice.repository.ProductRepository;
 import com.hanghae.reviewservice.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -28,8 +32,9 @@ public class ReviewService {
     private final S3Service s3Service;
 
     //상품에 대한 리뷰 등록
-    public ReviewResponseDto createReview(Long productId, ReviewRequestDto requestDto,
-                                          MultipartFile imageFile) {
+    @Transactional
+    public ReviewResponseDto createReview(Long productId, ReviewRequestDto requestDto, MultipartFile imageFile) {
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다."));
 
@@ -40,9 +45,9 @@ public class ReviewService {
         }
 
         //이미지 파일 처리
-        String uploadImage = s3Service.uploadImage(imageFile);
+        String imageUrl = s3Service.uploadImage(imageFile);
 
-        Review review = new Review(requestDto, product, uploadImage);
+        Review review = new Review(requestDto, product, imageUrl);
 
         reviewRepository.save(review);
         productRepository.save(product);
@@ -70,24 +75,24 @@ public class ReviewService {
 
         //리뷰 리스트의 총 개수와 평균 점수 계산
         Long totalReviewCount = (long) reviewList.size();
-        double totalScore = 0.0;
+        float totalScore = 0.0f;
         for (Review review : reviewList) {
             totalScore += review.getScore();
         }
-        double averageScore = totalScore / totalReviewCount;
+        float averageScore = totalScore / totalReviewCount;
 
         //List<Review>를 List<ReviewResponseDto>로 변환
-        List<ReviewResponseDto> reviewResponseDtos = new ArrayList<>();
+        List<ReviewResponseDto> reviewResponseDtoList = new ArrayList<>();
         for (Review review : reviewList) {
-            reviewResponseDtos.add(new ReviewResponseDto(review));
+            reviewResponseDtoList.add(new ReviewResponseDto(review));
         }
 
-        ReviewListResponseDto reviewListResponseDto = new ReviewListResponseDto(reviewResponseDtos, totalReviewCount, averageScore, cursor);
+        ReviewListResponseDto reviewListResponseDto = new ReviewListResponseDto(reviewResponseDtoList, totalReviewCount, averageScore, cursor);
         return reviewListResponseDto;
     }
 
     //새로운 평균 점수 계산
-    private double calculateAverageScore(double averageScore, Long totalReviewCount, double newScore) {
+    private double calculateAverageScore(float averageScore, Long totalReviewCount, float newScore) {
         return (averageScore * totalReviewCount + newScore) / (totalReviewCount + 1);
     }
 

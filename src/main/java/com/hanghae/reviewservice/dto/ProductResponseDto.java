@@ -8,7 +8,7 @@ import lombok.Getter;
 public class ProductResponseDto {
     private Long id;
     private Long reviewCount;
-    private double score;
+    private float score;
 
     public ProductResponseDto(Product savedProduct) {
         this.id = savedProduct.getId();

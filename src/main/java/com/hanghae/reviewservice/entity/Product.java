@@ -15,14 +15,15 @@ import java.util.List;
 @NoArgsConstructor
 public class Product {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private Long reviewCount;
 
     @Column(nullable = false)
-    private double score; //평균 점수
+    private float score; //평균 점수
 
     @OneToMany(mappedBy = "product")
     private List<Review> reviews;
